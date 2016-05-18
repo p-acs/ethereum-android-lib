@@ -37,24 +37,9 @@ public class EthereumAndroid {
 
     private class CallbackHandler implements EthereumAndroidService.ResponseHandler {
 
-        private int trustedUid = Integer.MIN_VALUE;
-
         @Override
         public void onHandleResponseIntent(Intent intent) {
-            int uid = Binder.getCallingUid();
-            if (trustedUid != uid) {
-                String[] packages = context.getPackageManager().getPackagesForUid(uid);
-                List<String> packageList = Arrays.asList(packages);
-                if (packageList.contains(EthereumAndroidFactory.PACKAGENAME)) {
-                    trustedUid = uid;
-                } else {
-                    Log.w(TAG, "ignoring response from an untrusted uid: " + uid);
-                    return;
-                }
-            }
-
             handleResponse(intent);
-
         }
     }
 
@@ -63,12 +48,14 @@ public class EthereumAndroid {
     private final static String ID = "id";
     private final static String EXTRA_DATA = "data";
     private final static String EXTRA_ERROR = "error";
+    private final static String EXTRA_PACKAGE = "package";
 
 
     private final AtomicInteger messageId = new AtomicInteger(0);
     private final Context context;
     private final EthereumAndroidCallback callback;
     private final ObjectMapper objectMapper;
+    private final String packageName;
 
     public EthereumAndroid(Context context, EthereumAndroidCallback callback) {
         this.context = context;
@@ -76,6 +63,7 @@ public class EthereumAndroid {
         objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         EthereumAndroidService.responseHandler = new CallbackHandler();
+        packageName = context.getApplicationInfo().packageName;
     }
 
     public int getAccount(String accountAddress) {
@@ -91,6 +79,7 @@ public class EthereumAndroid {
             int id = messageId.incrementAndGet();
             intent.putExtra(ID, messageId.incrementAndGet());
             intent.putExtra(EXTRA_DATA, objectMapper.writeValueAsString(request));
+            intent.putExtra(EXTRA_PACKAGE,packageName);
             context.startService(intent);
             return id;
         } catch (JsonProcessingException e) {
