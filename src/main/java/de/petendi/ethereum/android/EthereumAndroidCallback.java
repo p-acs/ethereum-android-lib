@@ -16,9 +16,10 @@
 package de.petendi.ethereum.android;
 
 import de.petendi.ethereum.android.service.model.Response;
+import de.petendi.ethereum.android.service.model.ServiceError;
 
 public interface EthereumAndroidCallback {
     void handleResponse(int messageId, Response response);
 
-    void handleError(int messageId, Error error);
+    void handleError(int messageId, ServiceError serviceError);
 }

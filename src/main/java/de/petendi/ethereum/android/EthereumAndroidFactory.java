@@ -30,7 +30,7 @@ public class EthereumAndroidFactory {
     final static String PACKAGENAME = "de.petendi.ethereum.android";
     final static String FINGERPRINT = "2F91D2BEC39D37D4409855EFB9D856674D81A070";
     final static String SERVICE_ACTION = PACKAGENAME + ".action.REQUEST";
-    final static boolean DEV = true;
+    static boolean DEV = false;
 
     private static final String TAG = EthereumAndroid.class.getSimpleName();
     private final static char[] HEXCHARS = "0123456789ABCDEF".toCharArray();
@@ -63,8 +63,6 @@ public class EthereumAndroidFactory {
                     throw new IllegalStateException(e);
                 }
             }
-
-
         } else if (services.size() > 0) {
             throw new IllegalStateException("more than one suitable service found");
         }

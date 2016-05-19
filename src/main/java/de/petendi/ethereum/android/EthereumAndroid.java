@@ -17,21 +17,18 @@ package de.petendi.ethereum.android;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
-import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.petendi.ethereum.android.service.model.AccountRequest;
 import de.petendi.ethereum.android.service.model.Request;
 import de.petendi.ethereum.android.service.model.Response;
+import de.petendi.ethereum.android.service.model.ServiceError;
 
 public class EthereumAndroid {
 
@@ -42,8 +39,6 @@ public class EthereumAndroid {
             handleResponse(intent);
         }
     }
-
-    private final static String TAG = EthereumAndroid.class.getSimpleName();
 
     private final static String ID = "id";
     private final static String EXTRA_DATA = "data";
@@ -79,7 +74,7 @@ public class EthereumAndroid {
             int id = messageId.incrementAndGet();
             intent.putExtra(ID, messageId.incrementAndGet());
             intent.putExtra(EXTRA_DATA, objectMapper.writeValueAsString(request));
-            intent.putExtra(EXTRA_PACKAGE,packageName);
+            intent.putExtra(EXTRA_PACKAGE, packageName);
             context.startService(intent);
             return id;
         } catch (JsonProcessingException e) {
@@ -93,12 +88,12 @@ public class EthereumAndroid {
         String response = reponse.getStringExtra(EXTRA_DATA);
         if (error != null) {
             try {
-                Error errorObj = objectMapper.readValue(error, Error.class);
+                ServiceError errorObj = objectMapper.readValue(error, ServiceError.class);
                 callback.handleError(id, errorObj);
             } catch (IOException e) {
                 throw new IllegalArgumentException(e);
             }
-        } else if(response!=null) {
+        } else if (response != null) {
             try {
                 Response responseObj = objectMapper.readValue(response, Response.class);
                 callback.handleResponse(id, responseObj);
