@@ -72,7 +72,7 @@ public class EthereumAndroid {
             Intent intent = new Intent(EthereumAndroidFactory.SERVICE_ACTION);
             intent.setPackage(EthereumAndroidFactory.PACKAGENAME);
             int id = messageId.incrementAndGet();
-            intent.putExtra(ID, messageId.incrementAndGet());
+            intent.putExtra(ID, id);
             intent.putExtra(EXTRA_DATA, objectMapper.writeValueAsString(request));
             intent.putExtra(EXTRA_PACKAGE, packageName);
             context.startService(intent);
