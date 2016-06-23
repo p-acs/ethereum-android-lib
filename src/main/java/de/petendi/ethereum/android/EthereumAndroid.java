@@ -25,10 +25,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.petendi.ethereum.android.service.model.AccountRequest;
-import de.petendi.ethereum.android.service.model.Request;
-import de.petendi.ethereum.android.service.model.Response;
 import de.petendi.ethereum.android.service.model.ServiceError;
+import de.petendi.ethereum.android.service.model.WrappedRequest;
+import de.petendi.ethereum.android.service.model.WrappedResponse;
 
 public class EthereumAndroid {
 
@@ -61,13 +60,7 @@ public class EthereumAndroid {
         packageName = context.getApplicationInfo().packageName;
     }
 
-    public int getAccount(String accountAddress) {
-        AccountRequest accountRequest = new AccountRequest();
-        accountRequest.setAddress(accountAddress);
-        return send(accountRequest);
-    }
-
-    public int send(Request request) {
+    public int send(WrappedRequest request) {
         try {
             Intent intent = new Intent(EthereumAndroidFactory.SERVICE_ACTION);
             intent.setPackage(EthereumAndroidFactory.PACKAGENAME);
@@ -85,7 +78,7 @@ public class EthereumAndroid {
     private void handleResponse(Intent reponse) {
         int id = reponse.getIntExtra(ID, 0);
         String error = reponse.getStringExtra(EXTRA_ERROR);
-        String response = reponse.getStringExtra(EXTRA_DATA);
+        byte[] response = reponse.getByteArrayExtra(EXTRA_DATA);
         if (error != null) {
             try {
                 ServiceError errorObj = objectMapper.readValue(error, ServiceError.class);
@@ -95,7 +88,7 @@ public class EthereumAndroid {
             }
         } else if (response != null) {
             try {
-                Response responseObj = objectMapper.readValue(response, Response.class);
+                WrappedResponse responseObj = objectMapper.readValue(response, WrappedResponse.class);
                 callback.handleResponse(id, responseObj);
             } catch (IOException e) {
                 throw new IllegalArgumentException(e);

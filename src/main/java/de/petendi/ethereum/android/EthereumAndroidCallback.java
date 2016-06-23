@@ -15,11 +15,11 @@
  */
 package de.petendi.ethereum.android;
 
-import de.petendi.ethereum.android.service.model.Response;
 import de.petendi.ethereum.android.service.model.ServiceError;
+import de.petendi.ethereum.android.service.model.WrappedResponse;
 
 public interface EthereumAndroidCallback {
-    void handleResponse(int messageId, Response response);
+    void handleResponse(int messageId, WrappedResponse response);
 
     void handleError(int messageId, ServiceError serviceError);
 }

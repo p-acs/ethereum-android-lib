@@ -15,17 +15,28 @@
  */
 package de.petendi.ethereum.android.service.model;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+/**
+ * Created by ubuntu on 6/8/16.
+ */
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class AccountRequest extends Request {
-    private String address;
+public class WrappedRequest {
 
-    public String getAddress() {
-        return address;
+    private Object[] parameters;
+    private String command;
+
+    public Object[] getParameters() {
+        return parameters;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setParameters(Object[] parameters) {
+        this.parameters = parameters;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public void setCommand(String command) {
+        this.command = command;
     }
 }

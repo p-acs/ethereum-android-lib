@@ -13,10 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.petendi.ethereum.android.service.model;
+package de.petendi.ethereum.android;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class Request {
+import java.math.BigInteger;
+
+public final class Utils {
+
+    private static String splitHexString(String hexString) {
+        return hexString.replace("0x", "");
+    }
+
+    public static BigInteger fromHexString(String hexString) {
+        return new BigInteger(splitHexString(hexString), 16);
+    }
+
+    public static String toHexString(BigInteger value) {
+        return value.toString(16);
+    }
+
+    private Utils() {
+        //hide
+    }
 }
