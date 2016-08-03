@@ -15,8 +15,11 @@
  */
 package de.petendi.ethereum.android;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -25,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import de.petendi.ethereum.android.service.IEthereumService;
 import de.petendi.ethereum.android.service.model.ServiceError;
 import de.petendi.ethereum.android.service.model.WrappedRequest;
 import de.petendi.ethereum.android.service.model.WrappedResponse;
@@ -51,6 +55,10 @@ public class EthereumAndroid {
     private final ObjectMapper objectMapper;
     private final String packageName;
 
+    private IEthereumService binder;
+    private ServiceConnection serviceConnection;
+
+
     public EthereumAndroid(Context context, EthereumAndroidCallback callback) {
         this.context = context;
         this.callback = callback;
@@ -58,9 +66,23 @@ public class EthereumAndroid {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         EthereumAndroidService.responseHandler = new CallbackHandler();
         packageName = context.getApplicationInfo().packageName;
+        Intent intent = new Intent("de.petendi.ethereum.android.action.BIND_API");
+        intent.setPackage(EthereumAndroidFactory.PACKAGENAME);
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                binder = IEthereumService.Stub.asInterface(iBinder);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+                binder = null;
+            }
+        };
+        context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    public int send(WrappedRequest request) {
+    public int sendAsync(WrappedRequest request) {
         try {
             Intent intent = new Intent(EthereumAndroidFactory.SERVICE_ACTION);
             intent.setPackage(EthereumAndroidFactory.PACKAGENAME);
@@ -71,6 +93,18 @@ public class EthereumAndroid {
             context.startService(intent);
             return id;
         } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public WrappedResponse send(WrappedRequest request) {
+        if (binder == null) {
+            throw new IllegalStateException("not (yet) bound to service");
+        }
+        try {
+            String response = binder.dispatch(objectMapper.writeValueAsString(request));
+            return objectMapper.readValue(response, WrappedResponse.class);
+        } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
@@ -94,7 +128,10 @@ public class EthereumAndroid {
                 throw new IllegalArgumentException(e);
             }
         }
+    }
 
-
+    public void release() {
+        context.unbindService(serviceConnection);
+        binder = null;
     }
 }
