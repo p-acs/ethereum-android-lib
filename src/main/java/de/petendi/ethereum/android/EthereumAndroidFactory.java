@@ -46,7 +46,9 @@ public class EthereumAndroidFactory {
         Intent intent = new Intent(SERVICE_ACTION);
         intent.setPackage(PACKAGENAME);
         List<ResolveInfo> services = pm.queryIntentServices(intent, 0);
-        if (services.size() == 1) {
+        if (services == null) {
+            return false;
+        } else if (services.size() == 1) {
             if (DEV) {
                 return true;
             } else {
