@@ -28,6 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import de.petendi.ethereum.android.contract.ContractController;
+import de.petendi.ethereum.android.contract.ContractFactory;
 import de.petendi.ethereum.android.service.IEthereumService;
 import de.petendi.ethereum.android.service.model.ServiceError;
 import de.petendi.ethereum.android.service.model.WrappedRequest;
@@ -129,6 +131,11 @@ public class EthereumAndroid {
             }
         }
     }
+
+    public <T> T create(String contractAddress, String abi, Class<T> clazz) {
+        return new ContractFactory(new ContractController()).create(contractAddress,abi,clazz);
+    }
+
 
     public void release() {
         context.unbindService(serviceConnection);
