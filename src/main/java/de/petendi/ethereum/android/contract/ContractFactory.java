@@ -70,11 +70,11 @@ public class ContractFactory {
             }
 
             String functionName = method.getName();
-            byte[] encoded = contractController.encode(abi, method.getName(), args);
+            String encoded = contractController.encode(abi, method.getName(), args);
 
             if (method.getReturnType().equals(PendingTransaction.class)) {
 
-                byte[] rawTransaction = contractController.generateContractInteraction(address, value, encoded);
+                String rawTransaction = contractController.generateContractInteraction(address, value, encoded);
                 return Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[]{PendingTransaction.class}, new PendingTransactionInvocationHandler(abi, functionName, rawTransaction));
 
             } else {
@@ -89,10 +89,10 @@ public class ContractFactory {
 
         private final String abi;
         private final String functionName;
-        private final byte[] rawTransaction;
+        private final String rawTransaction;
 
 
-        public PendingTransactionInvocationHandler(String abi, String functionName, byte[] rawTransaction) {
+        public PendingTransactionInvocationHandler(String abi, String functionName, String rawTransaction) {
             this.abi = abi;
             this.functionName = functionName;
             this.rawTransaction = rawTransaction;

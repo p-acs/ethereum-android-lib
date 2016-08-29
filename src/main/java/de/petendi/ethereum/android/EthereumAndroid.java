@@ -15,10 +15,12 @@
  */
 package de.petendi.ethereum.android;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.IBinder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,14 +30,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.petendi.ethereum.android.contract.ContractController;
-import de.petendi.ethereum.android.contract.ContractFactory;
 import de.petendi.ethereum.android.service.IEthereumService;
 import de.petendi.ethereum.android.service.model.ServiceError;
 import de.petendi.ethereum.android.service.model.WrappedRequest;
 import de.petendi.ethereum.android.service.model.WrappedResponse;
 
 public class EthereumAndroid {
+
 
     private class CallbackHandler implements EthereumAndroidService.ResponseHandler {
 
@@ -59,6 +60,10 @@ public class EthereumAndroid {
 
     private IEthereumService binder;
     private ServiceConnection serviceConnection;
+
+    public EthereumAndroid(Context context) {
+        this(context, null);
+    }
 
 
     public EthereumAndroid(Context context, EthereumAndroidCallback callback) {
@@ -85,6 +90,11 @@ public class EthereumAndroid {
     }
 
     public int sendAsync(WrappedRequest request) {
+
+        if (callback == null) {
+            throw new IllegalStateException("no callback set");
+        }
+
         try {
             Intent intent = new Intent(EthereumAndroidFactory.SERVICE_ACTION);
             intent.setPackage(EthereumAndroidFactory.PACKAGENAME);
@@ -100,8 +110,8 @@ public class EthereumAndroid {
     }
 
     public WrappedResponse send(WrappedRequest request) {
-        if (binder == null) {
-            throw new IllegalStateException("not (yet) bound to service");
+        if (!hasServiceConnection()) {
+            throw new IllegalStateException("not (yet) connected to service");
         }
         try {
             String response = binder.dispatch(objectMapper.writeValueAsString(request));
@@ -109,6 +119,10 @@ public class EthereumAndroid {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public boolean hasServiceConnection() {
+        return binder!=null;
     }
 
     private void handleResponse(Intent reponse) {
@@ -132,8 +146,11 @@ public class EthereumAndroid {
         }
     }
 
-    public <T> T create(String contractAddress, String abi, Class<T> clazz) {
-        return new ContractFactory(new ContractController()).create(contractAddress,abi,clazz);
+    public void submitTransaction(Activity parentActivity, int requestCode, String transactionString) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setPackage(EthereumAndroidFactory.PACKAGENAME);
+        intent.setData(Uri.parse("eth:" + transactionString));
+        parentActivity.startActivityForResult(intent, requestCode);
     }
 
 
@@ -141,4 +158,7 @@ public class EthereumAndroid {
         context.unbindService(serviceConnection);
         binder = null;
     }
+
+    public Contracts contracts() {
+        return new Contracts(this);}
 }

@@ -82,6 +82,15 @@ public class EthereumAndroidFactory {
 
     }
 
+    public EthereumAndroid create() throws EthereumNotInstalledException{
+        if(isInstalled()) {
+            return new EthereumAndroid(context);
+        } else {
+            throw new EthereumNotInstalledException();
+        }
+
+    }
+
     private final static String sha1Hash(byte[] bytes) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");

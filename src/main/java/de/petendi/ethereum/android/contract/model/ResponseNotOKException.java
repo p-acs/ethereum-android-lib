@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.petendi.ethereum.android.contract;
+package de.petendi.ethereum.android.contract.model;
 
+public class ResponseNotOKException extends RuntimeException {
+    private final String errorMessage;
 
-public interface PendingTransaction<T> {
-    T decodeResult(String hexEncodedResult);
+    public ResponseNotOKException(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
 
-    String getUnsignedTransaction();
+    public String getErrorMessage() {
+        return errorMessage;
+    }
 }

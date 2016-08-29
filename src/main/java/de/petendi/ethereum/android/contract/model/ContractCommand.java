@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.petendi.ethereum.android.contract;
+package de.petendi.ethereum.android.contract.model;
 
-
-public interface PendingTransaction<T> {
-    T decodeResult(String hexEncodedResult);
-
-    String getUnsignedTransaction();
+public enum ContractCommand {
+    contract_call,
+    contract_creation,
+    contract_decode,
+    contract_encode,
+    contract_interaction
 }
