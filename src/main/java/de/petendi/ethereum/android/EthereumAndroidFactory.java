@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.util.Log;
 
 import java.security.MessageDigest;
@@ -72,14 +73,15 @@ public class EthereumAndroidFactory {
 
     }
 
-
-    public EthereumAndroid create(EthereumAndroidCallback callback) throws EthereumNotInstalledException{
-        if(isInstalled()) {
-            return new EthereumAndroid(context, callback);
+    public boolean showInstallationDialog() {
+        Intent playIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=de.petendi.ethereum.android"));
+        final PackageManager pm = context.getPackageManager();
+        if (pm.resolveActivity(playIntent, 0) != null) {
+            context.startActivity(playIntent);
+            return true;
         } else {
-            throw new EthereumNotInstalledException();
+            return false;
         }
-
     }
 
     public EthereumAndroid create() throws EthereumNotInstalledException{
@@ -88,7 +90,14 @@ public class EthereumAndroidFactory {
         } else {
             throw new EthereumNotInstalledException();
         }
+    }
 
+    public EthereumAndroid create(EthereumAndroidCallback callback) throws EthereumNotInstalledException{
+        if(isInstalled()) {
+            return new EthereumAndroid(context,callback);
+        } else {
+            throw new EthereumNotInstalledException();
+        }
     }
 
     private final static String sha1Hash(byte[] bytes) {

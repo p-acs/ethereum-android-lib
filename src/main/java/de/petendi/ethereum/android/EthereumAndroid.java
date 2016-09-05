@@ -54,7 +54,7 @@ public class EthereumAndroid {
 
     private final AtomicInteger messageId = new AtomicInteger(0);
     private final Context context;
-    private final EthereumAndroidCallback callback;
+    private EthereumAndroidCallback callback;
     private final ObjectMapper objectMapper;
     private final String packageName;
 
@@ -87,6 +87,14 @@ public class EthereumAndroid {
             }
         };
         context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    public void setCallback(EthereumAndroidCallback callback) {
+        this.callback = callback;
+    }
+
+    public EthereumAndroidCallback getCallback() {
+        return callback;
     }
 
     public int sendAsync(WrappedRequest request) {
