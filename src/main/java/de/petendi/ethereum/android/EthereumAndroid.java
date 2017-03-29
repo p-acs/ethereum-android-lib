@@ -161,6 +161,13 @@ public class EthereumAndroid {
         parentActivity.startActivityForResult(intent, requestCode);
     }
 
+    public void requestSignature(Activity parentActivity, int requestCode, String hexEncodedMessage) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setPackage(EthereumAndroidFactory.PACKAGENAME);
+        intent.setData(Uri.parse("eth:sign/" + hexEncodedMessage));
+        parentActivity.startActivityForResult(intent, requestCode);
+    }
+
 
     public void release() {
         context.unbindService(serviceConnection);

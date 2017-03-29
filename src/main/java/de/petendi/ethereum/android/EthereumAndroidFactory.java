@@ -34,7 +34,7 @@ public class EthereumAndroidFactory {
     static boolean DEV = false;
 
     private static final String TAG = EthereumAndroid.class.getSimpleName();
-    private final static char[] HEXCHARS = "0123456789ABCDEF".toCharArray();
+
 
     private final Context context;
 
@@ -105,21 +105,10 @@ public class EthereumAndroidFactory {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
             digest.update(bytes, 0, bytes.length);
             bytes = digest.digest();
-            return bytesToHex(bytes);
+            return Utils.bytesToHex(bytes);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-    }
-
-
-    private final static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEXCHARS[v >>> 4];
-            hexChars[j * 2 + 1] = HEXCHARS[v & 0x0F];
-        }
-        return new String(hexChars);
     }
 
 }
