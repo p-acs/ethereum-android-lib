@@ -80,7 +80,11 @@ public class ContractFactory {
             } else {
                 String response = contractController.call(address, BigInteger.ZERO, encoded);
                 Object[] decoded = contractController.decodeResult(abi, functionName, response);
-                return decoded[0];
+                if(method.getAnnotation(Tuple.class) != null) {
+                    return decoded;
+                } else {
+                    return decoded[0];
+                }
             }
         }
     }
@@ -106,7 +110,7 @@ public class ContractFactory {
             } else if (method.getName().startsWith("decodeResult")) {
 
                 Object[] decoded = contractController.decodeResult(abi, functionName, (String) args[0]);
-                if (method.getReturnType().isArray()) {
+                if(method.getAnnotation(Tuple.class) != null) {
                     return decoded;
                 } else {
                     return decoded[0];
