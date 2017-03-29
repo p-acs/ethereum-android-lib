@@ -20,6 +20,8 @@ import java.math.BigInteger;
 
 public final class Utils {
 
+    private static final char[] HEXCHARS = "0123456789ABCDEF".toCharArray();
+
     private static String splitHexString(String hexString) {
         return hexString.replace("0x", "");
     }
@@ -30,6 +32,16 @@ public final class Utils {
 
     public static String toHexString(BigInteger value) {
         return value.toString(16);
+    }
+
+    public static final String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEXCHARS[v >>> 4];
+            hexChars[j * 2 + 1] = HEXCHARS[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 
     private Utils() {
